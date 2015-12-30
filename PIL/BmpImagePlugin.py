@@ -144,7 +144,7 @@ class BmpImageFile(ImageFile.ImageFile):
                 elif file_info['bits'] in (24, 16) and file_info['rgb_mask'] in SUPPORTED[file_info['bits']]:
                     raw_mode = MASK_MODES[(file_info['bits'], file_info['rgb_mask'])]
                 else:
-                    # print(file_info['bits'], [hex(value) for value in file_info['rgb_mask']])
+                    print(file_info['bits'], [hex(value) for value in file_info['rgb_mask']])
                     raise IOError("Unsupported BMP bitfields layout")
             else:
                 raise IOError("Unsupported BMP bitfields layout")

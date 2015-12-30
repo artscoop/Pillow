@@ -124,21 +124,21 @@ class BmpImageFile(ImageFile.ImageFile):
         # Process BMP with Bitfields compression (not palette)
         if file_info['compression'] == self.BITFIELDS:
             SUPPORTED = {
-            32: [(0xff0000, 0xff00, 0xff, 0x0), (0xff0000, 0xff00, 0xff, 0xff000000), (0x0, 0x0, 0x0, 0x0), (0xff000000, 0xff0, 0xff0000, 0x0)],
+            32: [(0xff0000, 0xff00, 0xff, 0x0), (0xff0000, 0xff00, 0xff, 0xff000000), (0x0, 0x0, 0x0, 0x0), (0xff0000, 0xff00, 0xff)],
             24: [(0xff0000, 0xff00, 0xff), (0xff0000, 0xff00, 0xff)],
             16: [(0xf800, 0x7e0, 0x1f), (0x7c00, 0x3e0, 0x1f)]}
             MASK_MODES = {
                 (32, (0xff0000, 0xff00, 0xff, 0x0)): "BGRX",
                 (32, (0xff0000, 0xff00, 0xff, 0xff000000)): "BGRA",
                 (32, (0x0, 0x0, 0x0, 0x0)): "BGRA",
-                (32, (0xff000000, 0xff0, 0xff0000, 0x0)): "XBGR",
+                (32, (0xff0000, 0xff00, 0xff00)): "BGRX",  # 32-bit images can have a 24-bit mask only, see #1125
                 (24, (0xff0000, 0xff00, 0xff)): "BGR",
                 (24, (0xff, 0xff00, 0xff0000)): "RGB",
                 (16, (0xf800, 0x7e0, 0x1f)): "BGR;16",
                 (16, (0x7c00, 0x3e0, 0x1f)): "BGR;15"
             }
             if file_info['bits'] in SUPPORTED:
-                if file_info['bits'] == 32 and file_info['rgba_mask'] in SUPPORTED[file_info['bits']]:
+                if file_info['bits'] == 32 and (file_info['rgba_mask'] in SUPPORTED[file_info['bits']] or file_info['rgb_mask'] in SUPPORTED[file_info['bits']]):
                     raw_mode = MASK_MODES[(file_info['bits'], file_info['rgba_mask'])]
                     self.mode = "RGBA" if raw_mode in ("BGRA",) else self.mode
                 elif file_info['bits'] in (24, 16) and file_info['rgb_mask'] in SUPPORTED[file_info['bits']]:
